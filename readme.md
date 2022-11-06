@@ -8,5 +8,5 @@ Want to help? I'm up for it.
 
 Please don't send me a link to a hot mess of bullshit. I need it in 1. 2. 3. format. 
 
-You can post any thoughts you have about getting this started in this thread. 
+You can post any thoughts you have about getting this started in <a href="https://github.com/scripting/reallySimpleActivityPub/issues/1">this thread</a>. 
 

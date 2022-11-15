@@ -100,6 +100,17 @@ function serverpost (path, params, flAuthenticated, filedata, callback, urlServe
 function getServerInfo (callback) {
 	servercall ("api/v1/instance", undefined, undefined, callback);
 	}
+function getPublicTimeline (limit=100, callback) {
+	servercall ("api/v1/timelines/public", {limit}, undefined, callback);
+	}
+function getPublicStatusesWithTag (theTag, limit=100, callback) {
+	servercall ("api/v1/timelines/tag/" + theTag, {limit}, undefined, callback);
+	}
+function getUserStatuses (id, limit=100, callback) {
+	servercall ("api/v1/statuses/" + id, {limit}, undefined, callback);
+	}
+
+
 function testGetServerInfo () {
 	getServerInfo (function (err, theServerInfo) {
 		if (err) {
@@ -107,6 +118,36 @@ function testGetServerInfo () {
 			}
 		else {
 			console.log (jsonStringify (theServerInfo));
+			}
+		})
+	}
+function testGetPublicTimeline () {
+	getPublicTimeline (undefined, function (err, theTimeline) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theTimeline));
+			}
+		})
+	}
+function testGetPublicStatusesWithTag () {
+	getPublicStatusesWithTag ("testing", undefined, function (err, theStatuses) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theStatuses));
+			}
+		})
+	}
+function testGetUserStatuses () {
+	getUserStatuses ("109348280299564804", undefined, function (err, theStatuses) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theStatuses));
 			}
 		})
 	}

@@ -110,7 +110,6 @@ function getUserStatuses (id, limit=100, callback) {
 	servercall ("api/v1/statuses/" + id, {limit}, undefined, callback);
 	}
 
-
 function testGetServerInfo () {
 	getServerInfo (function (err, theServerInfo) {
 		if (err) {

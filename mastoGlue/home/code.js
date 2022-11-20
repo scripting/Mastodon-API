@@ -116,7 +116,7 @@ function postStatus (theMessage, callback) {
 		url: appConsts.urlMastodonServer + "api/v1/statuses",
 		type: "POST",
 		headers: {
-			Authorization: "Bearer " + mastodonMemory.access_token
+			Authorization: mastodonMemory.token_type + mastodonMemory.access_token
 			},
 		data: {
 			status: theMessage
@@ -140,6 +140,27 @@ function postStatus (theMessage, callback) {
 			}
 		});
 	}
+function verifyCredentials (callback) {
+	$.ajax ({
+		url: appConsts.urlMastodonServer + "api/v1/accounts/verify_credentials",
+		type: "GET",
+		headers: {
+			Authorization: mastodonMemory.token_type + " " + mastodonMemory.access_token
+			},
+		})  
+	.success (function (data, status) { 
+		callback (undefined, data);
+		}) 
+	.error (function (status) { 
+		try {
+			var jstruct = JSON.parse (status.responseText);
+			callback ({message: jstruct.error});
+			}
+		catch (err) {
+			callback ({message: "There was an error communicating with the server."});
+			}
+		});
+	}
 function testPostStatus () {
 	postStatus ("I'm a tootin fool", function (err, data) {
 		if (err) {
@@ -147,6 +168,16 @@ function testPostStatus () {
 			}
 		else {
 			console.log (data); //11/20/22 -- I have yet to see what I get back from this! ;-)
+			}
+		});
+	}
+function testVerifyCredentials () {
+	verifyCredentials (function (err, data) {
+		if (err) {
+			alertDialog (err.message);
+			}
+		else {
+			console.log (data); 
 			}
 		});
 	}

@@ -89,7 +89,7 @@ function getUrlForAuthorize (urlRedirect) {
 function getAccessToken (codeFromMasto, callback) {
 	const path = "oauth/token";
 	const params = {
-		grant_type: "client_credentials",
+		grant_type: "authorization_code", 
 		client_id: config.clientKey,
 		client_secret: config.clientSecret,
 		redirect_uri: config.urlRedirect,
@@ -114,6 +114,33 @@ function getAccessToken (codeFromMasto, callback) {
 		});
 	}
 
+function tootStatus (accessToken, statusText, callback) {
+	const theRequest = {
+		url: config.urlMastodonServer + "api/v1/statuses",
+		method: "POST",
+		headers: {
+			Authorization: "Bearer " + accessToken
+			},
+		body: "status=" + statusText
+		};
+	
+	request (theRequest, function (err, response, data) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			var code = response.statusCode;
+			if ((code < 200) || (code > 299)) {
+				const message = "The request returned a status code of " + response.statusCode + ".";
+				callback ({message});
+				}
+			else {
+				callback (undefined, data) 
+				}
+			}
+		});
+	}
+
 function handleHttpRequest (theRequest) {
 	var params = theRequest.params;
 	const token = params.oauth_token;
@@ -130,8 +157,14 @@ function handleHttpRequest (theRequest) {
 			}
 		theRequest.httpReturn (200, "application/json", utils.jsonStringify (jstruct));
 		}
+	function returnJsontext (jsontext) { //9/14/22 by DW
+		theRequest.httpReturn (200, "application/json", jsontext.toString ());
+		}
 	function returnError (jstruct) {
 		theRequest.httpReturn (500, "application/json", utils.jsonStringify (jstruct));
+		}
+	function returnNotFound () {
+		theRequest.httpReturn (404, "text/plain", "Not found.");
 		}
 	function returnRedirect (url, code) { 
 		var headers = {
@@ -176,11 +209,14 @@ function handleHttpRequest (theRequest) {
 			getAccessToken (params.code, httpReturn);
 			return;
 		
+		case "/toot": //11/20/22 by DW
+			tootStatus (params.access_token, params.status, httpReturn);
+			break;
 		
-		
+		default: 
+			returnNotFound ();
+			break;
 		}
-	
-	theRequest.httpReturn (404, "text/plain", "Not found.");
 	}
 
 const httpConfig = {

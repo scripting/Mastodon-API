@@ -110,47 +110,6 @@ function getAccessToken (codeFromMasto, callback) {
 	var urlServer = appConsts.urlMastoLandServer + "getaccesstoken?code=" + codeFromMasto;
 	httpRequest (urlServer, undefined, undefined, callback);
 	}
-function verifyCredentials (callback) {
-	$.ajax ({
-		url: appConsts.urlMastodonServer + "api/v1/accounts/verify_credentials",
-		type: "GET",
-		headers: {
-			Authorization: mastodonMemory.token_type + " " + mastodonMemory.access_token
-			},
-		})  
-	.success (function (data, status) { 
-		callback (undefined, data);
-		}) 
-	.error (function (status) { 
-		try {
-			var jstruct = JSON.parse (status.responseText);
-			callback ({message: jstruct.error});
-			}
-		catch (err) {
-			callback ({message: "There was an error communicating with the server."});
-			}
-		});
-	}
-function testPostStatus () {
-	postStatus ("I'm a tootin fool", function (err, data) {
-		if (err) {
-			alertDialog (err.message);
-			}
-		else {
-			console.log (data); //11/20/22 -- I have yet to see what I get back from this! ;-)
-			}
-		});
-	}
-function testVerifyCredentials () {
-	verifyCredentials (function (err, data) {
-		if (err) {
-			alertDialog (err.message);
-			}
-		else {
-			console.log (data); 
-			}
-		});
-	}
 
 function servercall (path, params, flAuthenticated, callback, urlServer=appConsts.urlMastoLandServer) {
 	var whenstart = new Date ();
@@ -172,17 +131,69 @@ function servercall (path, params, flAuthenticated, callback, urlServer=appConst
 		});
 	}
 
-
-function postNewStatus (status, callback) {
-	servercall ("toot", {status}, true, callback);
+function getServerInfo (callback) {
+	servercall ("api/v1/instance", undefined, undefined, callback);
 	}
-
+function getPublicTimeline (limit=100, callback) {
+	servercall ("api/v1/timelines/public", {limit}, undefined, callback);
+	}
+function getPublicStatusesWithTag (theTag, limit=100, callback) {
+	servercall ("api/v1/timelines/tag/" + theTag, {limit}, undefined, callback);
+	}
+function getUserStatuses (id, limit=100, callback) {
+	servercall ("api/v1/accounts/" + id + "/statuses/", {limit}, undefined, callback);
+	}
+function postNewStatus (status, inReplyTo, callback) {
+	const params = {
+		status,
+		inReplyTo
+		};
+	servercall ("toot", params, true, callback);
+	}
 function getUserInfo (callback) {
 	servercall ("getuserinfo", undefined, true, callback);
 	}
 
-
-
+function testGetServerInfo () {
+	getServerInfo (function (err, theServerInfo) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theServerInfo));
+			}
+		})
+	}
+function testGetPublicTimeline () {
+	getPublicTimeline (undefined, function (err, theTimeline) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theTimeline));
+			}
+		})
+	}
+function testGetPublicStatusesWithTag () {
+	getPublicStatusesWithTag ("testing", undefined, function (err, theStatuses) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theStatuses));
+			}
+		})
+	}
+function testGetUserStatuses () {
+	getUserStatuses ("109348280299564804", undefined, function (err, theStatuses) {
+		if (err) {
+			console.log (err.message);
+			}
+		else {
+			console.log (jsonStringify (theStatuses));
+			}
+		})
+	}
 function testGetUserInfo () {
 	getUserInfo (function (err, theInfo) {
 		if (err) {
@@ -190,6 +201,16 @@ function testGetUserInfo () {
 			}
 		else {
 			console.log (jsonStringify (theInfo));
+			}
+		});
+	}
+function testPostStatus () {
+	postStatus ("I'm a tootin fool", function (err, data) {
+		if (err) {
+			alertDialog (err.message);
+			}
+		else {
+			console.log (data); //11/20/22 -- I have yet to see what I get back from this! ;-)
 			}
 		});
 	}
@@ -258,7 +279,7 @@ function startup () {
 				if (!flcancel) {
 					mastodonMemory.lastTootString = tootableString;
 					saveMastodonMemory ();
-					postNewStatus (tootableString, function (err, data) {
+					postNewStatus (tootableString, "109382319175911764", function (err, data) {
 						if (err) {
 							alertDialog (err.message);
 							}

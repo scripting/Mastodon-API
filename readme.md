@@ -1,12 +1,3 @@
-# Really Simple ActivityPub. 
+# Mastodon-API
 
-I keep puzzling over this idea.
-
-If I had an outline of its basic features we could start there. I'm pretty good at factoring APIs. 
-
-Want to help? I'm up for it. 
-
-Please don't send me a link to a hot mess of bullshit. I need it in 1. 2. 3. format. 
-
-You can post any thoughts you have about getting this started in <a href="https://github.com/scripting/reallySimpleActivityPub/issues/1">this thread</a>. 
-
+This repo started out as being about the ActivityPub protocol, but we drifted mostly over to <a href="https://github.com/scripting/Mastodon-API/issues">working on the Mastodon API</a>, so I switched the name to that. 

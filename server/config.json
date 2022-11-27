@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "appName": "Radio 3",
+      "clientKey": "xxx",
+      "clientSecret": "xxx",
+      "urlWebsite": "http://radio3.io/",
+      "urlRedirect": "http://radio3.io/",
+      "urlMastodonServer": "https://social.masto.land/",
+      "scopes": "write:statuses+read:accounts"
+      }
+    ]
+  }

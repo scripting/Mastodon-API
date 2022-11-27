@@ -1,0 +1,13 @@
+{
+	"name": "mastoserver",
+	"description": "A server app that connects to Mastodon via OAuth.",
+	"author": "Dave Winer <dave@scripting.com>",
+	"main": "mastoserver.js",
+	"license": "MIT",
+	"version": "0.4.0",
+	"dependencies" : {
+		"request": "*",
+		"davehttp": "*",
+		"daveutils": "*"
+		} 
+	}

@@ -1,29 +1,28 @@
-const appConsts = {
-	
-	};
 function startButtons () {
 	const loginbutton = $("#idMastoSignonButton");
 	loginbutton.click (function () {
 		console.log ("Click");
 		loginbutton.blur ();
-		userLogin (mastodonMemory.clientKey);
+		userLogin (mastoConsts.clientKey);
 		});
 	
 	const signoffbutton = $("#idMastoSignoffButton");
 	signoffbutton.click (function () {
-		for (var x in mastodonMemory) {
-			mastodonMemory [x] = undefined;
+		for (var x in mastoMemory) {
+			mastoMemory [x] = undefined;
 			}
-		initMastodonMemory ();
-		saveMastodonMemory ();
+		initMastoMemory ();
+		saveMastoMemory ();
 		});
 	
 	const mastotootbutton = $("#idMastoTootButton");
 	mastotootbutton.click (function () {
-		askDialog ("What would you like to toot?", mastodonMemory.lastTootString, "Oh say can you toot.", function (tootableString, flcancel) {
+		if (localStorage.lastTootString === undefined) {
+			localStorage.lastTootString = "";
+			}
+		askDialog ("What would you like to toot?", localStorage.lastTootString, "Oh say can you toot.", function (tootableString, flcancel) {
 			if (!flcancel) {
-				mastodonMemory.lastTootString = tootableString;
-				saveMastodonMemory ();
+				localStorage.lastTootString = tootableString;
 				postNewStatus (tootableString, undefined, function (err, data) {
 					if (err) {
 						alertDialog (err.message);
@@ -49,7 +48,7 @@ function startButtons () {
 		});
 	}
 function everySecond () {
-	const flSignedOn = mastodonMemory.access_token !== undefined;
+	const flSignedOn = mastoMemory.access_token !== undefined;
 	if (flSignedOn) {
 		$("#idSignedOn").css ("display", "block");
 		$("#idSignedOff").css ("display", "none");
@@ -62,7 +61,7 @@ function everySecond () {
 function startup () {
 	
 	console.log ("startup");
-	restoreMastodonMemory ();
+	restoreMastoMemory ();
 	lookForOauthToken (); //if found it doesn't return
 	startButtons ();
 	self.setInterval (everySecond, 1000);

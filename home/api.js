@@ -1,48 +1,39 @@
-const myServerUrl = "http://localhost:1401/"; 
-
-const myClientKey = "2l26ogBP5utGp-VAf0J66r23KDn5aCRTjC0m9MoHdfQ"; //radio3 on 
-
-
-var mastodonMemory = {
-	urlMastoLandServer: myServerUrl, 
+const mastoConsts = {
+	serverUrl: "http://oauth.masto.land/",
 	
-	clientKey: myClientKey, 
-	
+	clientKey: "2l26ogBP5utGp-VAf0J66r23KDn5aCRTjC0m9MoHdfQ" //radio3 on social.masto.land
+	};
+
+var mastoMemory = {
 	access_token: undefined,
 	created_at: undefined,
 	scope: undefined,
-	token_type: undefined,
-	
-	lastTootString: ""
+	token_type: undefined
 	}
-function saveMastodonMemory () {
-	localStorage.mastodonMemory = jsonStringify (mastodonMemory);
+
+function saveMastoMemory () {
+	localStorage.mastoMemory = jsonStringify (mastoMemory);
 	}
-function restoreMastodonMemory () {
-	if (localStorage.mastodonMemory !== undefined) {
+function restoreMastoMemory () {
+	if (localStorage.mastoMemory !== undefined) {
 		var jstruct;
 		try {
-			jstruct = JSON.parse (localStorage.mastodonMemory);
+			jstruct = JSON.parse (localStorage.mastoMemory);
 			for (var x in jstruct) {
-				mastodonMemory [x] = jstruct [x];
+				mastoMemory [x] = jstruct [x];
 				}
 			}
 		catch (err) {
-			console.log ("restoreMastodonMemory: err.message == " + err.message);
+			console.log ("restoreMastoMemory: err.message == " + err.message);
 			}
 		}
-	console.log ("restoreMastodonMemory: mastodonMemory == " + jsonStringify (mastodonMemory));
+	console.log ("restoreMastoMemory: mastoMemory == " + jsonStringify (mastoMemory));
 	}
-
-function initMastodonMemory () {
-	for (var x in mastodonMemory) {
-		mastodonMemory [x] = undefined;
+function initMastoMemory () {
+	for (var x in mastoMemory) {
+		mastoMemory [x] = undefined;
 		}
-	mastodonMemory.urlMastoLandServer = myServerUrl;
-	mastodonMemory.clientKey = myClientKey;
 	}
-
-
 
 function getAllUrlParams () { //9/7/22 by DW
 	var s = location.search;
@@ -117,22 +108,22 @@ function buildParamList (paramtable, flPrivate) { //8/4/21 by DW
 
 function userLogin (clientKey) {
 	const urlThisPage = trimTrailing (window.location.href, "#");
-	const urlRedirectTo = mastodonMemory.urlMastoLandServer + "connect?redirect_url=" + urlThisPage + "&client_key=" + clientKey;
+	const urlRedirectTo = mastoConsts.serverUrl + "connect?redirect_url=" + urlThisPage + "&client_key=" + clientKey;
 	window.location.href = urlRedirectTo;
 	}
 function getAccessToken (codeFromMasto, callback) {
-	var urlServer = mastodonMemory.urlMastoLandServer + "getaccesstoken?code=" + codeFromMasto + "&client_key=" + mastodonMemory.clientKey;
+	var urlServer = mastoConsts.serverUrl + "getaccesstoken?code=" + codeFromMasto + "&client_key=" + mastoConsts.clientKey;
 	httpRequest (urlServer, undefined, undefined, callback);
 	}
 
-function servercall (path, params, flAuthenticated, callback, urlServer=mastodonMemory.urlMastoLandServer) {
+function servercall (path, params, flAuthenticated, callback, urlServer=mastoConsts.serverUrl) {
 	var whenstart = new Date ();
 	if (params === undefined) {
 		params = new Object ();
 		}
 	if (flAuthenticated) { //1/11/21 by DW
-		params.access_token = mastodonMemory.access_token;
-		params.client_key = mastodonMemory.clientKey;
+		params.access_token = mastoMemory.access_token;
+		params.client_key = mastoConsts.clientKey;
 		}
 	var url = urlServer + path + "?" + buildParamList (params);
 	httpRequest (url, undefined, undefined, function (err, jsontext) {
@@ -230,7 +221,7 @@ function testPostStatus () {
 		});
 	}
 
-function lookForOauthToken () {
+function lookForOauthToken () { //if it finds the token it dosn't return
 	var allparams = getAllUrlParams (); //9/7/22 by DW
 	var paramval = {
 		};
@@ -249,9 +240,9 @@ function lookForOauthToken () {
 						alertDialog (err.message);
 						}
 					for (var x in jstruct) {
-						mastodonMemory [x] = jstruct [x];
+						mastoMemory [x] = jstruct [x];
 						}
-					saveMastodonMemory ();
+					saveMastoMemory ();
 					setTimeout (function () { //make absolutely sure the localStorage data is saved before we redirect
 						window.location.href = stringNthField (window.location.href, "?", 1);
 						}, 5)

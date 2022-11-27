@@ -6,29 +6,14 @@ const davehttp = require ("davehttp");
 const utils = require ("daveutils");
 
 var config = {
-	servers: [
-		{
-			clientKey: undefined, 
-			clientSecret: undefined,
-			urlRedirect: undefined,
-			urlMastodonServer: undefined,
-			}
-		],
-	
-	
-	
-	
+	apps: new Array (),
 	httpPort: process.env.PORT || 1401,
-	myDomain: "localhost",
 	flLogToConsole: true,
-	flAllowAccessFromAnywhere: true, //1/2/18 by DW
-	flPostEnabled: false, //1/3/18 by DW
-	
+	flAllowAccessFromAnywhere: true, 
+	flPostEnabled: false, 
+	blockedAddresses: []
 	};
-
 const fnameConfig = "config.json";
-
-
 function readConfig (callback) {
 	fs.readFile (fnameConfig, function (err, jsontext) {
 		if (!err) {
@@ -46,6 +31,7 @@ function readConfig (callback) {
 		callback ();
 		});
 	}
+
 function httpRequest (url, method="GET", callback) {
 	var theRequest = {
 		method,
@@ -82,7 +68,6 @@ function buildParamList (paramtable, flPrivate=false) { //8/4/21 by DW
 		}
 	return (s);
 	}
-
 function getAppInfo (clientKey, callback) {
 	readConfig (function () {
 		var info = undefined;
@@ -100,7 +85,6 @@ function getAppInfo (clientKey, callback) {
 			}
 		});
 	}
-
 function getUrlForAuthorize (clientKey, urlRedirect, callback) {
 	const path = "oauth/authorize";
 	getAppInfo (clientKey, function (err, appInfo) {
@@ -122,7 +106,6 @@ function getUrlForAuthorize (clientKey, urlRedirect, callback) {
 			}
 		});
 	}
-
 function getAccessToken (codeFromMasto, clientKey, callback) {
 	const path = "oauth/token";
 	getAppInfo (clientKey, function (err, appInfo) {
@@ -259,11 +242,6 @@ function getUserInfo (accessToken, clientKey, callback) {
 	}
 
 
-function addUserAgent (headers) {
-	headers ["User-Agent"] = myProductName + " v" + myVersion;
-	}
-
-
 function handleHttpRequest (theRequest) {
 	var params = theRequest.params;
 	const token = params.oauth_token;
@@ -362,16 +340,15 @@ function handleHttpRequest (theRequest) {
 	
 	}
 
-const httpConfig = {
-	port: config.httpPort,
-	flLogToConsole: config.flLogToConsole,
-	flAllowAccessFromAnywhere: config.flAllowAccessFromAnywhere,
-	flPostEnabled: config.flPostEnabled,
-	blockedAddresses: config.blockedAddresses //4/17/18 by DW
-	};
-
 readConfig (function () {
 	console.log ("config == " + utils.jsonStringify (config));
+	const httpConfig = {
+		port: config.httpPort,
+		flLogToConsole: config.flLogToConsole,
+		flAllowAccessFromAnywhere: config.flAllowAccessFromAnywhere,
+		flPostEnabled: config.flPostEnabled,
+		blockedAddresses: config.blockedAddresses 
+		};
 	davehttp.start (httpConfig, handleHttpRequest);
 	});
 
